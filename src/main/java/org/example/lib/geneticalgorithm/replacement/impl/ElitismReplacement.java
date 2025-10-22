@@ -9,7 +9,7 @@ public class ElitismReplacement implements Replacement {
 
     private int elitisimCount;
 
-    ElitismReplacement(int elitismCount) {
+    public ElitismReplacement(int elitismCount) {
         this.elitisimCount = elitismCount;
     }
 
