@@ -20,7 +20,6 @@ public class Main {
         for (int i = 0; i < l - 1; i++) {
             totalDistance += dist[order.get(i)][order.get(i + 1)];
         }
-        totalDistance += dist[order.get(l - 1)][order.get(0)];
         return 1.0 / totalDistance;
     }
     public static void main(String[] args) {
