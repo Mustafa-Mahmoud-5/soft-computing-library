@@ -1,6 +1,8 @@
 package org.example.lib.geneticalgorithm;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import org.example.lib.Algorithm;
 import org.example.lib.geneticalgorithm.chromosome.Chromosome;
 import org.example.lib.geneticalgorithm.chromosome.factory.ChromosomeFactory;
@@ -44,15 +46,24 @@ public class GeneticAlgorithm implements Algorithm {
     private int currentGeneration = 0;
 
     // config props, maybe should be moved to a config class
+    @Setter @Getter
     private int populationSize = 10;
+    @Setter @Getter
     private int chromosomeSize = 5;
+    @Setter @Getter
     private int maxGenerations = 50;
+    @Setter @Getter
     private double crossoverRate = 0.6;
+    @Setter @Getter
     private double mutationRate = 0.1;
+    @Setter @Getter
     private int elitismCount = 0;
+    @Setter @Getter
     private int steadyStateReplacementCount = 2;
 
-    private Predicate<Chromosome> isFeasiblePredicate;
+    @Setter
+    private Predicate<Chromosome> isFeasibleChromosomePredicate;
+    @Setter
     private Function<Chromosome, Double> fitnessFunction;
 
     @Override
@@ -61,7 +72,7 @@ public class GeneticAlgorithm implements Algorithm {
         calculatePopulationFitness();
         for(int i = 1; i <= maxGenerations; i++) { // later make it while(!isFinished())
             applySelection();
-            generate();
+            generate(); // crossover+mutation
             applyReplacement();
             calculatePopulationFitness();
         }
@@ -101,7 +112,7 @@ public class GeneticAlgorithm implements Algorithm {
         }
     }
 
-    public void setReplacementOperator(REPLACEMENT_METHOD method) {
+    public void setReplacementMethod(REPLACEMENT_METHOD method) {
         switch (method) {
             case GENERATIONAL -> replacementOperator = new GenerationalReplacement();
             case STEADY_STATE -> replacementOperator = new SteadyStateReplacement(steadyStateReplacementCount);
@@ -123,6 +134,7 @@ public class GeneticAlgorithm implements Algorithm {
 
     private void calculatePopulationFitness() {
         for(int i = 0; i < populationSize; i++) {
+            System.out.println(population.get(i));
             double fitness = fitnessFunction.apply(population.get(i));
             population.get(i).setFitness(fitness);
         }
