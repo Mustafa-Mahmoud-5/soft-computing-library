@@ -18,7 +18,7 @@ public class BinaryChromosome extends Chromosome {
     }
 
     @Override
-    public List<?> getGenes() {
+    public List<Integer> getGenes() {
         return List.of();
     }
 }
