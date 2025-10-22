@@ -18,7 +18,25 @@ public class BinaryChromosome extends Chromosome {
     }
 
     @Override
-    public List<?> getGenes() {
-        return List.of();
+    public List<Integer> getGenes() {
+        return this.genes;
     }
+
+    @Override
+    public void setGenes(List<?> genes) {
+        this.genes = new ArrayList<>();
+        for (Object gene : genes) {
+            if (gene instanceof Integer) {
+                int value = (Integer) gene;
+                if (value != 0 && value != 1) {
+                    throw new IllegalArgumentException("Binary chromosome genes must be 0 or 1");
+                }
+                this.genes.add(value);
+            } else {
+                throw new IllegalArgumentException("Binary chromosome genes must be integers");
+            }
+        }
+    }
+
+
 }
