@@ -9,7 +9,7 @@ public class SteadyStateReplacement implements Replacement {
     int replaceCount;
 
     // replace few of the worst(replaceCount) with new offspring
-    SteadyStateReplacement(int replaceCount) {
+    public SteadyStateReplacement(int replaceCount) {
         this.replaceCount = replaceCount;
     }
 

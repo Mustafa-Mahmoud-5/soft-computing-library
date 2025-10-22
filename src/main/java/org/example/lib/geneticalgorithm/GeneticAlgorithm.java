@@ -11,14 +11,14 @@ import org.example.lib.geneticalgorithm.crossover.Crossover;
 import org.example.lib.geneticalgorithm.crossover.impl.KPointCrossover;
 import org.example.lib.geneticalgorithm.crossover.impl.Order1Crossover;
 import org.example.lib.geneticalgorithm.crossover.impl.SinglePointCrossover;
-import org.example.lib.geneticalgorithm.enums.CHROMOSOME_TYPE;
-import org.example.lib.geneticalgorithm.enums.CROSSOVER_METHOD;
-import org.example.lib.geneticalgorithm.enums.MUTATION_METHOD;
-import org.example.lib.geneticalgorithm.enums.SELECTION_METHOD;
+import org.example.lib.geneticalgorithm.enums.*;
 import org.example.lib.geneticalgorithm.mutation.Mutation;
 import org.example.lib.geneticalgorithm.mutation.impl.FlipMutation;
 import org.example.lib.geneticalgorithm.mutation.impl.SwapMutation;
 import org.example.lib.geneticalgorithm.replacement.Replacement;
+import org.example.lib.geneticalgorithm.replacement.impl.ElitismReplacement;
+import org.example.lib.geneticalgorithm.replacement.impl.GenerationalReplacement;
+import org.example.lib.geneticalgorithm.replacement.impl.SteadyStateReplacement;
 import org.example.lib.geneticalgorithm.selection.Selection;
 import org.example.lib.geneticalgorithm.selection.impl.RouletteWheelSelection;
 import org.example.lib.geneticalgorithm.selection.impl.TournamentSelection;
@@ -50,8 +50,9 @@ public class GeneticAlgorithm implements Algorithm {
     private double crossoverRate = 0.6;
     private double mutationRate = 0.1;
     private int elitismCount = 0;
+    private int steadyStateReplacementCount = 2;
 
-    private Predicate<Chromosome> isFeasible;
+    private Predicate<Chromosome> isFeasiblePredicate;
     private Function<Chromosome, Double> fitnessFunction;
 
     @Override
@@ -85,10 +86,10 @@ public class GeneticAlgorithm implements Algorithm {
 
     public void setCrossoverMethod(CROSSOVER_METHOD method) {
         switch (method) {
-            case SINGLE_POINT -> this.crossoverOperator = new SinglePointCrossover();
-            case K_POINT -> this.crossoverOperator = new KPointCrossover();
-            case ORDER1 -> this.crossoverOperator = new Order1Crossover();
-            default -> throw new IllegalArgumentException("Unsupported crossover type: " + method);
+            case SINGLE_POINT -> crossoverOperator = new SinglePointCrossover();
+            case K_POINT -> crossoverOperator = new KPointCrossover();
+            case ORDER1 -> crossoverOperator = new Order1Crossover();
+            default -> throw new IllegalArgumentException("Unsupported crossover method: " + method);
         }
     }
 
@@ -96,7 +97,16 @@ public class GeneticAlgorithm implements Algorithm {
         switch (method) {
             case FLIP -> mutationOperator = new FlipMutation();
             case SWAP -> mutationOperator = new SwapMutation();
-            default -> throw new IllegalArgumentException("Unsupported crossover type: " + method);
+            default -> throw new IllegalArgumentException("Unsupported mutation method: " + method);
+        }
+    }
+
+    public void setReplacementOperator(REPLACEMENT_METHOD method) {
+        switch (method) {
+            case GENERATIONAL -> replacementOperator = new GenerationalReplacement();
+            case STEADY_STATE -> replacementOperator = new SteadyStateReplacement(steadyStateReplacementCount);
+            case ELITISM -> replacementOperator = new ElitismReplacement(elitismCount);
+            default -> throw new IllegalArgumentException("Unsupported mutation method: " + method);
         }
     }
 
