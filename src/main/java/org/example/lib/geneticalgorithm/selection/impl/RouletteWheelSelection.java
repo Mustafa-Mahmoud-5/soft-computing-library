@@ -20,7 +20,7 @@ public class RouletteWheelSelection implements Selection {
             fitnesses.add(chromosome.getFitness());
         }
 
-        if(totalFitness == 0) return selectRandom(population, selectCount);
+        if(totalFitness <= 0) return selectRandom(population, selectCount);
 
         List<Double> fitnessesPrfx = buildPrefixSumArr(fitnesses);
 
