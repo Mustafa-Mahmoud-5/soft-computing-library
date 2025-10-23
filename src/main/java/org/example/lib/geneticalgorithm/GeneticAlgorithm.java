@@ -120,7 +120,9 @@ public class GeneticAlgorithm implements Algorithm {
             Chromosome chromosome = chromosomeFactory.newInstance(chromosomeSize);
             chromosome.initializeGenes();
             System.out.println(chromosome.getGenes());
-            population.add(chromosome);
+            if (isFeasibleChromosomePredicate == null || isFeasibleChromosomePredicate.test(chromosome)) {
+                population.add(chromosome);
+            }
         }
     }
 
@@ -147,8 +149,12 @@ public class GeneticAlgorithm implements Algorithm {
             mutationOperator.mutate(c1, mutationRate);
             mutationOperator.mutate(c2, mutationRate);
 
-            matingPool.set(i, c1);
-            matingPool.set(i+1, c2);
+            if (isFeasibleChromosomePredicate == null || isFeasibleChromosomePredicate.test(c1)) {
+                matingPool.set(i, c1);
+            }
+            if (isFeasibleChromosomePredicate == null || isFeasibleChromosomePredicate.test(c2)) {
+                matingPool.set(i+1, c2);
+            }
         }
 
         if(matingPool.size() %2 == 1) {

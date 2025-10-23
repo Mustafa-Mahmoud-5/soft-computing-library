@@ -10,8 +10,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
     static double tspFitness(Chromosome chromosome,double[][] dist) {
@@ -37,6 +35,7 @@ public class Main {
             List<Integer> genes = (List<Integer>) chromosome.getGenes();
             return genes.size() == new HashSet<>(genes).size(); // no duplicates
         };
+
 
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
         geneticAlgorithm.setChromosomeType(CHROMOSOME_TYPE.PERMUTATION);
