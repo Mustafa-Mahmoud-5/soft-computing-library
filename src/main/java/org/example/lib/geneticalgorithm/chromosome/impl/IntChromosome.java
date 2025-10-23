@@ -4,19 +4,24 @@ import org.example.lib.geneticalgorithm.chromosome.Chromosome;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class IntChromosome extends Chromosome {
-    List<Integer> genes;
+    private List<Integer> genes;
+    private final Random random = new Random();
+    private final int boundary;
 
-    public IntChromosome(int size) {
+    public IntChromosome(int size, int boundary) {
         super(size);
         this.genes = new ArrayList<>();
+        this.boundary = boundary;
     }
 
-
     @Override
-    protected void initializeGenes() {
-
+    public void initializeGenes() {
+        for(int i = 0; i < size; i++) {
+            genes.add(random.nextInt(boundary));
+        }
     }
 
     @Override

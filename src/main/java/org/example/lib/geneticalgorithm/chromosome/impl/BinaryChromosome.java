@@ -4,9 +4,11 @@ import org.example.lib.geneticalgorithm.chromosome.Chromosome;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BinaryChromosome extends Chromosome {
-    List<Integer> genes; // 0/1
+    private List<Integer> genes; // 0/1
+    private final Random random = new Random();
 
     public BinaryChromosome(int size) {
         super(size);
@@ -14,7 +16,10 @@ public class BinaryChromosome extends Chromosome {
     }
 
     @Override
-    protected void initializeGenes() {
+    public void initializeGenes() {
+        for(int i = 0; i < size; i++) {
+            genes.add(random.nextInt(2));
+        }
     }
 
     @Override

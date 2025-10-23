@@ -16,9 +16,8 @@ public abstract class Chromosome {
 
     public Chromosome(int size) {
         this.size = size;
-        initializeGenes();
     }
-    protected abstract void initializeGenes();
+    public abstract void initializeGenes();
     public abstract List<?> getGenes();
     public abstract void setGenes(List<?> genes);
 }
