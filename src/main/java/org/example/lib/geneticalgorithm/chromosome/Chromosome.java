@@ -20,4 +20,5 @@ public abstract class Chromosome {
     }
     protected abstract void initializeGenes();
     public abstract List<?> getGenes();
+    public abstract void setGenes(List<?> genes);
 }
