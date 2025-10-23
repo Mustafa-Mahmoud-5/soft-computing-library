@@ -149,7 +149,7 @@ public class GeneticAlgorithm implements Algorithm {
     // applies crossover then mutation
     private void generate() {
         for(int i = 0;i < matingPool.size()/2; i++) {
-            List<Chromosome> children = crossoverOperator.crossover(matingPool.get(i), matingPool.get(i+1), crossoverRate, chromosomeFactory);
+            List<Chromosome> children = crossoverOperator.crossover(matingPool.get(i), matingPool.get(i+1), crossoverRate);
             Chromosome c1 = children.get(0);
             Chromosome c2 = children.get(1);
 

@@ -22,4 +22,16 @@ public class PermutationChromosome extends Chromosome {
     public List<Integer> getGenes() {
         return this.genes;
     }
+
+    @Override
+    public void setGenes(List<?> genes) {
+        this.genes = new ArrayList<>();
+        for (Object gene : genes) {
+            if (gene instanceof Integer) {
+                this.genes.add((Integer) gene);
+            } else {
+                throw new IllegalArgumentException("PermutationChromosome genes must be integers");
+            }
+        }
+    }
 }
