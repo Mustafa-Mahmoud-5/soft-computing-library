@@ -51,7 +51,7 @@ public class GeneticAlgorithm implements Algorithm {
     @Setter @Getter
     private int chromosomeSize = 5;
     @Setter @Getter
-    private int maxGenerations = 50;
+    private int maxGenerations = 200;
     @Setter @Getter
     private double crossoverRate = 0.6;
     @Setter @Getter
@@ -62,6 +62,8 @@ public class GeneticAlgorithm implements Algorithm {
     private int steadyStateReplacementCount = 2;
     @Setter @Getter
     private int crossoverPoints = 1;
+    @Setter @Getter
+    private int selectionCount = 10;
 
     @Setter
     private Predicate<Chromosome> isFeasibleChromosomePredicate;
@@ -152,13 +154,13 @@ public class GeneticAlgorithm implements Algorithm {
 
     private void applySelection() {
         matingPool.clear();
-        matingPool = selectionOperator.select(population);
+        matingPool = selectionOperator.select(population, selectionCount);
     }
 
     // produces new generation in the matingPool
     // applies crossover then mutation
     private void generate() {
-        for(int i = 0;i < matingPool.size()/2; i++) {
+        for(int i = 0; i < matingPool.size(); i+=2) {
             List<Chromosome> children = crossoverOperator.crossover(matingPool.get(i), matingPool.get(i+1), crossoverRate, chromosomeFactory);
             Chromosome c1 = children.get(0);
             Chromosome c2 = children.get(1);
@@ -168,6 +170,11 @@ public class GeneticAlgorithm implements Algorithm {
 
             matingPool.set(i, c1);
             matingPool.set(i+1, c2);
+        }
+
+        if(matingPool.size() %2 == 1) {
+            Chromosome lastChromosome = matingPool.get(matingPool.size() - 1);
+            mutationOperator.mutate(lastChromosome, mutationRate); // updated by ref
         }
     }
 

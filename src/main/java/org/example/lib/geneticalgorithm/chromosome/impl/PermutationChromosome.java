@@ -16,7 +16,7 @@ public class PermutationChromosome extends Chromosome {
 
     @Override
     public void initializeGenes() {
-        for(int i = 0; i < size - 1; i++) {
+        for(int i = 0; i < size; i++) {
             genes.add(i);
         }
         Collections.shuffle(genes);
