@@ -80,11 +80,18 @@ public class GeneticAlgorithm implements Algorithm {
         }
     }
 
-    public void setChromosomeType(CHROMOSOME_TYPE type) {
+
+    public void setChromosomeType(CHROMOSOME_TYPE type, Object ... params) {
         switch (type) {
             case BINARY -> chromosomeFactory = new BinaryChromosomeFactory();
             case PERMUTATION -> chromosomeFactory = new PermutationChromosomeFactory();
-            case INTEGER -> chromosomeFactory = new IntChromosomeFactory();
+            case INTEGER -> {
+                int randomIntBoundary = 100;
+                if(params.length > 0 && params[0] instanceof Integer) {
+                    randomIntBoundary = (Integer) params[0];
+                }
+                chromosomeFactory = new IntChromosomeFactory(randomIntBoundary);
+            }
             default -> throw new IllegalArgumentException("Unsupported chromosome type: " + type);
         }
     }
@@ -130,13 +137,14 @@ public class GeneticAlgorithm implements Algorithm {
         if(!population.isEmpty()) population.clear();
         for(int i = 0; i < populationSize; i++) {
             Chromosome chromosome = chromosomeFactory.newInstance(chromosomeSize);
+            chromosome.initializeGenes();
+            System.out.println(chromosome.getGenes());
             population.add(chromosome);
         }
     }
 
     private void calculatePopulationFitness() {
         for(int i = 0; i < populationSize; i++) {
-            System.out.println(population.get(i));
             double fitness = fitnessFunction.apply(population.get(i));
             population.get(i).setFitness(fitness);
         }

@@ -3,6 +3,7 @@ package org.example.lib.geneticalgorithm.chromosome.impl;
 import org.example.lib.geneticalgorithm.chromosome.Chromosome;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PermutationChromosome extends Chromosome {
@@ -14,8 +15,11 @@ public class PermutationChromosome extends Chromosome {
     }
 
     @Override
-    protected void initializeGenes() {
-        // generate a permutation
+    public void initializeGenes() {
+        for(int i = 0; i < size - 1; i++) {
+            genes.add(i);
+        }
+        Collections.shuffle(genes);
     }
 
     @Override
