@@ -158,7 +158,7 @@ public class GeneticAlgorithm implements Algorithm {
     // produces new generation in the matingPool
     // applies crossover then mutation
     private void generate() {
-        for(int i = 0;i < matingPool.size()/2; i++) {
+        for(int i = 0; i < matingPool.size(); i+=2) {
             List<Chromosome> children = crossoverOperator.crossover(matingPool.get(i), matingPool.get(i+1), crossoverRate, chromosomeFactory);
             Chromosome c1 = children.get(0);
             Chromosome c2 = children.get(1);
@@ -168,6 +168,11 @@ public class GeneticAlgorithm implements Algorithm {
 
             matingPool.set(i, c1);
             matingPool.set(i+1, c2);
+        }
+
+        if(matingPool.size() %2 == 1) {
+            Chromosome lastChromosome = matingPool.get(matingPool.size() - 1);
+            mutationOperator.mutate(lastChromosome, mutationRate); // updated by ref
         }
     }
 
