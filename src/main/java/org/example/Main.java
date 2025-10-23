@@ -19,6 +19,7 @@ public class Main {
         geneticAlgorithm.setChromosomeType(CHROMOSOME_TYPE.PERMUTATION);
         geneticAlgorithm.setSelectionMethod(SELECTION_METHOD.ROULETTE_WHEEL);
         geneticAlgorithm.setCrossoverMethod(CROSSOVER_METHOD.SINGLE_POINT);
+        geneticAlgorithm.setMutationMethod(MUTATION_METHOD.FLIP);
         geneticAlgorithm.setReplacementMethod(REPLACEMENT_METHOD.GENERATIONAL);
         geneticAlgorithm.setFitnessFunction(fitness);
         geneticAlgorithm.setIsFeasibleChromosomePredicate(chromosome -> true);

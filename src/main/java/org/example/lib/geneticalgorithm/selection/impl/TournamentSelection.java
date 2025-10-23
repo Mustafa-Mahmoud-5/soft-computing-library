@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TournamentSelection implements Selection {
     @Override
-    public List<Chromosome> select(List<Chromosome> population) {
+    public List<Chromosome> select(List<Chromosome> population, int selectCount) {
         return new ArrayList<>();
     }
 }
