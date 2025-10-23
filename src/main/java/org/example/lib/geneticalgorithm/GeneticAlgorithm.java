@@ -116,7 +116,7 @@ public class GeneticAlgorithm implements Algorithm {
 
     private void initializePopulation() {
         if(!population.isEmpty()) population.clear();
-        for(int i = 0; i < populationSize; i++) {
+        while (population.size() < populationSize) {
             Chromosome chromosome = chromosomeFactory.newInstance(chromosomeSize);
             chromosome.initializeGenes();
             System.out.println(chromosome.getGenes());
