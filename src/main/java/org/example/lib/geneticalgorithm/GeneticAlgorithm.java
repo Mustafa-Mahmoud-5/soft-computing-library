@@ -96,6 +96,8 @@ public class GeneticAlgorithm implements Algorithm {
 
     @Override
     public void run() {
+
+
         initializeOperators();
 
         initializePopulation();
@@ -178,7 +180,7 @@ public class GeneticAlgorithm implements Algorithm {
     private void initializeSelectionMethod(SELECTION_METHOD method) {
         switch (method) {
             case ROULETTE_WHEEL -> selectionOperator = new RouletteWheelSelection();
-            case TOURNAMENT -> selectionOperator = new TournamentSelection();
+            case TOURNAMENT -> selectionOperator = new TournamentSelection(2,3);
             default -> throw new IllegalArgumentException("Unsupported selection type: " + method);
         }
     }
@@ -270,6 +272,8 @@ public class GeneticAlgorithm implements Algorithm {
             bestFitness = newBest.getFitness();
         }
     }
+
+
 
 
     public void displayResults() {

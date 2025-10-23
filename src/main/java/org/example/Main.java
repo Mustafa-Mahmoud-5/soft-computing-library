@@ -4,6 +4,7 @@ import org.example.lib.geneticalgorithm.GeneticAlgorithm;
 import org.example.lib.geneticalgorithm.chromosome.Chromosome;
 import org.example.lib.geneticalgorithm.enums.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -32,17 +33,28 @@ public class Main {
        Function<Chromosome, Double> fitness = (chromosome) -> tspFitness(chromosome, dist);
 
 
+        Predicate<Chromosome> isFeasible = chromosome -> {
+            List<Integer> genes = (List<Integer>) chromosome.getGenes();
+            return genes.size() == new HashSet<>(genes).size(); // no duplicates
+        };
+
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
-        geneticAlgorithm.setChromosomeType(CHROMOSOME_TYPE.BINARY);
-        geneticAlgorithm.setSelectionMethod(SELECTION_METHOD.ROULETTE_WHEEL);
-        geneticAlgorithm.setCrossoverMethod(CROSSOVER_METHOD.SINGLE_POINT);
-        geneticAlgorithm.setMutationMethod(MUTATION_METHOD.FLIP);
+        geneticAlgorithm.setChromosomeType(CHROMOSOME_TYPE.PERMUTATION);
+        geneticAlgorithm.setSelectionMethod(SELECTION_METHOD.TOURNAMENT);
+        geneticAlgorithm.setCrossoverMethod(CROSSOVER_METHOD.ORDER1);
+        geneticAlgorithm.setMutationMethod(MUTATION_METHOD.SWAP);
         geneticAlgorithm.setReplacementMethod(REPLACEMENT_METHOD.GENERATIONAL);
+
+        geneticAlgorithm.setChromosomeSize(dist.length);
+        geneticAlgorithm.setPopulationSize(50);
+        geneticAlgorithm.setMaxGenerations(500);
+        geneticAlgorithm.setCrossoverRate(0.8);
+        geneticAlgorithm.setMutationRate(0.2);
+
         geneticAlgorithm.setFitnessFunction(fitness);
-        geneticAlgorithm.setIsFeasibleChromosomePredicate(chromosome -> true);
+        geneticAlgorithm.setIsFeasibleChromosomePredicate(isFeasible);
 
         geneticAlgorithm.run();
-
         geneticAlgorithm.displayResults();
     }
 }
