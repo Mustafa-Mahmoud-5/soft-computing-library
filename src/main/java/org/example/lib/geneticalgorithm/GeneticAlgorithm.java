@@ -60,6 +60,8 @@ public class GeneticAlgorithm implements Algorithm {
     private int elitismCount = 0;
     @Setter @Getter
     private int steadyStateReplacementCount = 2;
+    @Setter @Getter
+    private int crossoverPoints = 1;
 
     @Setter
     private Predicate<Chromosome> isFeasibleChromosomePredicate;
@@ -98,7 +100,7 @@ public class GeneticAlgorithm implements Algorithm {
     public void setCrossoverMethod(CROSSOVER_METHOD method) {
         switch (method) {
             case SINGLE_POINT -> crossoverOperator = new SinglePointCrossover();
-            case K_POINT -> crossoverOperator = new KPointCrossover();
+            case K_POINT -> crossoverOperator = new KPointCrossover(crossoverPoints);
             case ORDER1 -> crossoverOperator = new Order1Crossover();
             default -> throw new IllegalArgumentException("Unsupported crossover method: " + method);
         }
@@ -149,7 +151,7 @@ public class GeneticAlgorithm implements Algorithm {
     // applies crossover then mutation
     private void generate() {
         for(int i = 0;i < matingPool.size()/2; i++) {
-            List<Chromosome> children = crossoverOperator.crossover(matingPool.get(i), matingPool.get(i+1), crossoverRate);
+            List<Chromosome> children = crossoverOperator.crossover(matingPool.get(i), matingPool.get(i+1), crossoverRate, chromosomeFactory);
             Chromosome c1 = children.get(0);
             Chromosome c2 = children.get(1);
 
