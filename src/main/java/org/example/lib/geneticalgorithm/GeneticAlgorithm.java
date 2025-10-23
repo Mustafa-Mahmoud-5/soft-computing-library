@@ -39,10 +39,27 @@ public class GeneticAlgorithm implements Algorithm {
     private Mutation mutationOperator;
     private Replacement replacementOperator;
 
+    
+    @Setter
+    private CHROMOSOME_TYPE chromosomeType;
+    @Setter
+    private SELECTION_METHOD selectionMethod;
+    @Setter
+    private CROSSOVER_METHOD crossoverMethod;
+    @Setter
+    private MUTATION_METHOD mutationMethod;
+    @Setter
+    private REPLACEMENT_METHOD replacementMethod;
+
+
     // statistical data
+    @Getter
     private Chromosome bestChromosome;
+    @Getter
     private double avgFitness = 0;
+    @Getter
     private double bestFitness = 0;
+    @Getter
     private int currentGeneration = 0;
 
     // config props, maybe should be moved to a config class
@@ -64,76 +81,36 @@ public class GeneticAlgorithm implements Algorithm {
     private int crossoverPoints = 1;
     @Setter @Getter
     private int selectionCount = 10;
+    @Setter @Getter
+    private int geneValueBoundary = 10;
+    @Setter @Getter
+    private double fitnessTarget;
 
     @Setter
     private Predicate<Chromosome> isFeasibleChromosomePredicate;
     @Setter
     private Function<Chromosome, Double> fitnessFunction;
 
+    @Setter
+    private Predicate<GeneticAlgorithm> terminationCondition;
+
     @Override
     public void run() {
+        initializeOperators();
+
         initializePopulation();
         calculatePopulationFitness();
-        for(int i = 1; i <= maxGenerations; i++) { // later make it while(!isFinished())
+        updateBestChromosome();
+
+        while (!shouldTerminate()) {
             applySelection();
             generate(); // crossover+mutation
             applyReplacement();
             calculatePopulationFitness();
+            updateBestChromosome();
         }
     }
 
-
-    public void setChromosomeType(CHROMOSOME_TYPE type, Object ... params) {
-        switch (type) {
-            case BINARY -> chromosomeFactory = new BinaryChromosomeFactory();
-            case PERMUTATION -> chromosomeFactory = new PermutationChromosomeFactory();
-            case INTEGER -> {
-                int randomIntBoundary = 100;
-                if(params.length > 0 && params[0] instanceof Integer) {
-                    randomIntBoundary = (Integer) params[0];
-                }
-                chromosomeFactory = new IntChromosomeFactory(randomIntBoundary);
-            }
-            default -> throw new IllegalArgumentException("Unsupported chromosome type: " + type);
-        }
-    }
-
-    public void setSelectionMethod(SELECTION_METHOD method) {
-        switch (method) {
-            case ROULETTE_WHEEL -> selectionOperator = new RouletteWheelSelection();
-            case TOURNAMENT -> selectionOperator = new TournamentSelection();
-            default -> throw new IllegalArgumentException("Unsupported selection type: " + method);
-        }
-    }
-
-    public void setCrossoverMethod(CROSSOVER_METHOD method) {
-        switch (method) {
-            case SINGLE_POINT -> crossoverOperator = new SinglePointCrossover();
-            case K_POINT -> crossoverOperator = new KPointCrossover(crossoverPoints);
-            case ORDER1 -> crossoverOperator = new Order1Crossover();
-            default -> throw new IllegalArgumentException("Unsupported crossover method: " + method);
-        }
-    }
-
-    public void setMutationMethod(MUTATION_METHOD method) {
-        switch (method) {
-            case FLIP -> mutationOperator = new FlipMutation();
-            case SWAP -> mutationOperator = new SwapMutation();
-            default -> throw new IllegalArgumentException("Unsupported mutation method: " + method);
-        }
-    }
-
-    public void setReplacementMethod(REPLACEMENT_METHOD method) {
-        switch (method) {
-            case GENERATIONAL -> replacementOperator = new GenerationalReplacement();
-            case STEADY_STATE -> replacementOperator = new SteadyStateReplacement(steadyStateReplacementCount);
-            case ELITISM -> replacementOperator = new ElitismReplacement(elitismCount);
-            default -> throw new IllegalArgumentException("Unsupported mutation method: " + method);
-        }
-    }
-
-
-    private void validateConfig() {}
 
     private void initializePopulation() {
         if(!population.isEmpty()) population.clear();
@@ -178,10 +155,127 @@ public class GeneticAlgorithm implements Algorithm {
         }
     }
 
+
     private void applyReplacement() {
-        replacementOperator.replace(population, matingPool);
+        population = replacementOperator.replace(population, matingPool);
+    }
+
+    private void initializeChromosomeType(CHROMOSOME_TYPE type, Object ... params) {
+        switch (type) {
+            case BINARY -> chromosomeFactory = new BinaryChromosomeFactory();
+            case PERMUTATION -> chromosomeFactory = new PermutationChromosomeFactory();
+            case INTEGER -> {
+                int randomIntBoundary = 100;
+                if(params.length > 0 && params[0] instanceof Integer) {
+                    randomIntBoundary = (Integer) params[0];
+                }
+                chromosomeFactory = new IntChromosomeFactory(randomIntBoundary);
+            }
+            default -> throw new IllegalArgumentException("Unsupported chromosome type: " + type);
+        }
+    }
+
+    private void initializeSelectionMethod(SELECTION_METHOD method) {
+        switch (method) {
+            case ROULETTE_WHEEL -> selectionOperator = new RouletteWheelSelection();
+            case TOURNAMENT -> selectionOperator = new TournamentSelection();
+            default -> throw new IllegalArgumentException("Unsupported selection type: " + method);
+        }
+    }
+
+    private void initializeCrossoverMethod(CROSSOVER_METHOD method) {
+        switch (method) {
+            case SINGLE_POINT -> crossoverOperator = new SinglePointCrossover();
+            case K_POINT -> {
+                if(crossoverPoints < 1) throw new IllegalArgumentException("Kpoint crossover requires crossoverPoints param set");
+                crossoverOperator = new KPointCrossover(crossoverPoints);
+            }
+            case ORDER1 -> crossoverOperator = new Order1Crossover();
+            default -> throw new IllegalArgumentException("Unsupported crossover method: " + method);
+        }
+    }
+
+    private void initializeMutationMethod(MUTATION_METHOD method) {
+        switch (method) {
+            case FLIP -> mutationOperator = new FlipMutation();
+            case SWAP -> mutationOperator = new SwapMutation();
+            default -> throw new IllegalArgumentException("Unsupported mutation method: " + method);
+        }
+    }
+
+    private void initializeReplacementMethod(REPLACEMENT_METHOD method) {
+        switch (method) {
+            case GENERATIONAL -> replacementOperator = new GenerationalReplacement();
+            case STEADY_STATE -> replacementOperator = new SteadyStateReplacement(steadyStateReplacementCount);
+            case ELITISM -> replacementOperator = new ElitismReplacement(elitismCount);
+            default -> throw new IllegalArgumentException("Unsupported mutation method: " + method);
+        }
     }
 
 
-    // TODO: add getters/setters for required attributes only
+    private void initializeOperators() {
+        if(chromosomeType != null) {
+            initializeChromosomeType(chromosomeType, geneValueBoundary);
+        }
+
+        if (selectionMethod != null) {
+            initializeSelectionMethod(selectionMethod);
+        }
+
+        if (crossoverMethod != null) {
+            initializeCrossoverMethod(crossoverMethod);
+        }
+
+        if (mutationMethod != null) {
+            initializeMutationMethod(mutationMethod);
+        }
+
+        if (replacementMethod != null) {
+            initializeReplacementMethod(replacementMethod);
+            if(replacementMethod == REPLACEMENT_METHOD.GENERATIONAL) {
+                selectionCount = populationSize;
+            }
+        }
+
+
+    }
+
+    private boolean shouldTerminate() {
+        if (terminationCondition != null && terminationCondition.test(this)) {
+            return true;
+        }
+
+        if (maxGenerations != 0 && currentGeneration++ >= maxGenerations) {
+            return true;
+        }
+
+        if (fitnessTarget != 0 && bestFitness >= fitnessTarget) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateBestChromosome() {
+        Chromosome newBest = population.get(0);
+
+        for (Chromosome c : population) {
+            if (c.getFitness() > newBest.getFitness()) {
+                newBest = c;
+            }
+        }
+
+        if (bestChromosome == null || newBest.getFitness() > bestChromosome.getFitness()) {
+            bestChromosome = newBest;
+            bestFitness = newBest.getFitness();
+        }
+    }
+
+
+    public void displayResults() {
+        System.out.println("Results Summary:");
+        System.out.println("Generations: " + getCurrentGeneration());
+        System.out.println("Best Fitness: " + getBestFitness());
+        System.out.println("Best Chromosome: " + getBestChromosome().getGenes());
+    }
 }

@@ -16,13 +16,16 @@ public class Main {
         };
 
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
-        geneticAlgorithm.setChromosomeType(CHROMOSOME_TYPE.PERMUTATION);
+        geneticAlgorithm.setChromosomeType(CHROMOSOME_TYPE.BINARY);
         geneticAlgorithm.setSelectionMethod(SELECTION_METHOD.ROULETTE_WHEEL);
         geneticAlgorithm.setCrossoverMethod(CROSSOVER_METHOD.SINGLE_POINT);
         geneticAlgorithm.setMutationMethod(MUTATION_METHOD.FLIP);
         geneticAlgorithm.setReplacementMethod(REPLACEMENT_METHOD.GENERATIONAL);
         geneticAlgorithm.setFitnessFunction(fitness);
         geneticAlgorithm.setIsFeasibleChromosomePredicate(chromosome -> true);
+
         geneticAlgorithm.run();
+
+        geneticAlgorithm.displayResults();
     }
 }
