@@ -10,12 +10,11 @@ import java.util.Random;
 public class SwapMutation implements Mutation {
     @Override
     public void mutate(Chromosome chromosome, double mutationRate) {
-        PermutationChromosome p = (PermutationChromosome) chromosome;
         Random r = new Random();
         if (r.nextDouble() < mutationRate) {
-            int i = r.nextInt(p.getSize());
-            int j = r.nextInt(p.getSize());
-            Collections.swap(p.getGenes(), i, j);
+            int i = r.nextInt(chromosome.getSize());
+            int j = r.nextInt(chromosome.getSize());
+            Collections.swap(chromosome.getGenes(), i, j);
         }
 
     }
