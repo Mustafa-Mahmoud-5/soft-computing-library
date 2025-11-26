@@ -9,7 +9,9 @@ import org.example.lib.FuzzyLogic.Inference.Operators.Interfaces.OrOperator;
 import org.example.lib.FuzzyLogic.Inference.Operators.Impl.MinAndOperator;
 import org.example.lib.FuzzyLogic.Inference.Operators.Impl.MaxOrOperator;
 import org.example.lib.FuzzyLogic.Defuzzification.Defuzzier;
+import org.example.lib.FuzzyLogic.Defuzzification.Impl.Centroid;
 import org.example.lib.FuzzyLogic.Defuzzification.Impl.WeightedAverage;
+import org.example.lib.FuzzyLogic.Fuzzification.Membership.MembershipCentroidUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +31,7 @@ public class Mamdani implements InferenceEngine {
     private double[] lastXSamples = new double[0];
     private double[] lastAggregated = new double[0];
     private Map<Integer, Double> lastRuleFirings = new HashMap<>();
+
     @Override
     public void setRules(List<Rule> rules) {
         this.rules = rules == null ? new ArrayList<>() : new ArrayList<>(rules);
@@ -39,20 +42,53 @@ public class Mamdani implements InferenceEngine {
         if (output == null) throw new IllegalArgumentException("output variable cannot be null");
         if (inputs == null) throw new IllegalArgumentException("inputs cannot be null");
 
-        // prepare samples across output domain
-        double min = output.getMin();
-        double max = output.getMax();
-        if (!Double.isFinite(min) || !Double.isFinite(max) || max <= min) {
-            throw new IllegalArgumentException("output variable must have a valid min < max domain");
+        if (output.getFuzzySets().isEmpty()) {
+            throw new IllegalArgumentException("output variable must have at least one fuzzy set");
         }
 
-        int n = Math.max(2, sampleCount);
-        double[] xs = new double[n];
-        double[] aggregated = new double[n];
+        // Prepare sampling grid for centroid computation
+        double min = output.getMin();
+        double max = output.getMax();
+        int n = Math.max(2, sampleCount);//101
+        double[] xs = new double[n];// 0=> 101
         double step = (max - min) / (n - 1);
         for (int i = 0; i < n; i++) {
             xs[i] = min + i * step;
-            aggregated[i] = 0.0;
+        }
+
+        // Initialize aggregated membership for each output fuzzy set
+        int numFuzzySets = output.getFuzzySets().size();
+        double[] aggregated = new double[numFuzzySets];
+        double[] centroids = new double[numFuzzySets];
+        
+        // Precompute centroids for each output fuzzy set using analytic formulas when available
+        int idx = 0;
+        for (org.example.lib.FuzzyLogic.Fuzzification.Variables.FuzzySet fuzzySet : output.getFuzzySets().values()) {
+            org.example.lib.FuzzyLogic.Fuzzification.Membership.MembershipFunction mf = fuzzySet.getMembershipFunction();
+
+            double centroid;
+            if (mf == null) {
+                centroid = (min + max) / 2.0;
+            } else if (mf instanceof org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Triangular) {
+                org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Triangular t =
+                        (org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Triangular) mf;
+                centroid = MembershipCentroidUtils.triangularCentroid(t.getA(), t.getB(), t.getC());
+            } else if (mf instanceof org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Trapezoidal) {
+                org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Trapezoidal tr =
+                        (org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Trapezoidal) mf;
+                centroid = MembershipCentroidUtils.trapezoidalCentroid(tr.getA(), tr.getB(), tr.getC(), tr.getD());
+            } else if (mf instanceof org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Guassian) {
+                org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Guassian g =
+                        (org.example.lib.FuzzyLogic.Fuzzification.Membership.impl.Guassian) mf;
+                centroid = MembershipCentroidUtils.gaussianCentroid(g.getC(), g.getSigma());
+            } else {
+                // fallback to numeric sampling-based centroid  count sample n
+                centroid = MembershipCentroidUtils.computeCentroid(mf, min, max, n);
+            }
+
+            centroids[idx] = centroid;
+            aggregated[idx] = 0.0;
+            idx++;
         }
 
         lastRuleFirings.clear();
@@ -101,24 +137,36 @@ public class Mamdani implements InferenceEngine {
             firing = firing * rule.getWeight();
             lastRuleFirings.put(rule.getId(), firing);
 
-            // implication + aggregation across xs
+            // implication + aggregation for the corresponding output fuzzy set
             String outSetName = rule.getConsequent().getFuzzySetName();
-            org.example.lib.FuzzyLogic.Fuzzification.Variables.FuzzySet outSet = output.getFuzzySet(outSetName);
-            if (outSet == null || outSet.getMembershipFunction() == null) continue;
-
-            for (int i = 0; i < n; i++) {
-                double muOut = outSet.getMembershipFunction().compute(xs[i]);
-                double implied = productImplication ? (firing * muOut) : Math.min(firing, muOut);
-                if (implied > aggregated[i]) aggregated[i] = implied; // max aggregation
+            int outSetIdx = 0;
+            boolean found = false;
+            for (String setName : output.getFuzzySets().keySet()) {
+                if (setName.equals(outSetName)) {
+                    found = true;
+                    break;
+                }
+                outSetIdx++;
+            }
+            
+            if (found && outSetIdx < numFuzzySets) {
+                // Aggregate firing degree (max aggregation per fuzzy set)
+                if (firing > aggregated[outSetIdx]) {
+                    aggregated[outSetIdx] = firing;
+                }
             }
         }
 
-        // save last arrays
+        // save last arrays for debug display (sample-based)
+        double[] lastAgg = new double[n];
+        for (int i = 0; i < Math.min(n, numFuzzySets); i++) {
+            lastAgg[i] = aggregated[i];
+        }
         lastXSamples = Arrays.copyOf(xs, xs.length);
-        lastAggregated = Arrays.copyOf(aggregated, aggregated.length);
+        lastAggregated = Arrays.copyOf(lastAgg, lastAgg.length);
 
-        // defuzzify
-        double crisp = defuzzier.defuzzify(xs, aggregated);
+        // defuzzify using center of sums with analytical centroids
+        double crisp = defuzzier.defuzzify(centroids, aggregated);
         output.setValue(crisp);
     }
 

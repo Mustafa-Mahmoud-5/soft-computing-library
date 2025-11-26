@@ -37,43 +37,43 @@ public class DemoMalignancy {
         RuleBase rb = new RuleBase();
         RuleEditor editor = new RuleEditor(rb);
 
-        // Rule 1: If Size is High OR Irregularity is High OR Density is High THEN Malignant
-        editor.createRule()
-                .when("Size", "High")
-                .or("Irregularity", "High")
-                .or("Density", "High")
-                .then("Malignancy", "Malignant")
-                .withWeight(1.0)
-                .build();
+        // // Rule 1: If Size is High OR Irregularity is High OR Density is High THEN Malignant
+        // editor.createRule()
+        //         .when("Size", "High")
+        //         .or("Irregularity", "High")
+        //         .or("Density", "High")
+        //         .then("Malignancy", "Malignant")
+        //         .withWeight(1.0)
+        //         .build();
 
-        // Rule 2: If Size is Low AND Irregularity is Low AND Density is Low THEN Benign
+        // Rule 1: If Size is Low AND Irregularity is Low AND Density is Low THEN Benign
         editor.createRule()
                 .when("Size", "Low")
-                .and("Irregularity", "Low")
-                .and("Density", "Low")
+                .and("Irregularity", "Medium")
+                //.and("Density", "Low")
                 .then("Malignancy", "Benign")
                 .withWeight(1.0)
                 .build();
 
-        // Rule 3: If Size is Medium AND Irregularity is High THEN Malignant
+        // Rule 2: If Size is Medium AND Irregularity is High THEN Malignant
         editor.createRule()
                 .when("Size", "Medium")
                 .and("Irregularity", "High")
                 .then("Malignancy", "Malignant")
-                .withWeight(0.9)
+                .withWeight(1.0)
                 .build();
 
-        // Rule 4: If Density is Medium AND Irregularity is Medium THEN Malignant (weaker)
+        // Rule 3: If Density is Medium AND Irregularity is Medium THEN Malignant (weaker)
         editor.createRule()
                 .when("Density", "Medium")
                 .and("Irregularity", "Medium")
                 .then("Malignancy", "Malignant")
-                .withWeight(0.6)
+                .withWeight(1.0)
                 .build();
 
-        // Rule 5: If Size is Low AND Density is Medium THEN Benign
+        // Rule 4: If Size is Low AND Density is Medium THEN Benign
         editor.createRule()
-                .when("Size", "Low")
+                .when("Density", "Low")
                 .and("Density", "Medium")
                 .then("Malignancy", "Benign")
                 .withWeight(0.8)
@@ -85,9 +85,9 @@ public class DemoMalignancy {
         engine.setSampleCount(101);
 
         // example patient 1
-        size.setValue(60.0); // somewhat large
-        irregularity.setValue(70.0); // irregular
-        density.setValue(40.0); // normal
+        size.setValue(30.0); // somewhat large
+        irregularity.setValue(80.0); // irregular
+        density.setValue(90.0); // normal
 
         List<FuzzyVariable> inputs = Arrays.asList(size, irregularity, density);
         engine.infer(inputs, malignancy);

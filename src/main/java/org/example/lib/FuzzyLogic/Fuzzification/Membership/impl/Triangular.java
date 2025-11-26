@@ -30,6 +30,10 @@ public class Triangular implements MembershipFunction {
         }
     }
 
+    public double getA() { return a; }
+    public double getB() { return b; }
+    public double getC() { return c; }
+
     @Override
     public double compute(double x) {
         if (x <= a || x >= c) return 0.0;

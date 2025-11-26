@@ -19,6 +19,11 @@ public class Trapezoidal implements MembershipFunction {
         else { rightVertical = false; mRight = -1.0 / (d - c); qRight = 1.0 - mRight * c; }
     }
 
+    public double getA() { return a; }
+    public double getB() { return b; }
+    public double getC() { return c; }
+    public double getD() { return d; }
+
     @Override
     public double compute(double x) {
         if (x <= a || x >= d) return 0.0;

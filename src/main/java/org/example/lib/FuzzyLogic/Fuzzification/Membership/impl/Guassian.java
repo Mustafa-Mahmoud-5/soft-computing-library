@@ -11,6 +11,9 @@ public class Guassian implements MembershipFunction {
         this.sigma = sigma;
     }
 
+    public double getC() { return c; }
+    public double getSigma() { return sigma; }
+
     @Override
     public double compute(double x) {
         double diff = x - c;
