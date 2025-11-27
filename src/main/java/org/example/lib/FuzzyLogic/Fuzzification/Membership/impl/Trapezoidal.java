@@ -26,4 +26,13 @@ public class Trapezoidal implements MembershipFunction {
         if (x < b) return leftVertical ? 0.0 : mLeft * x + qLeft;
         else return rightVertical ? 0.0 : mRight * x + qRight;
     }
+    public double getA() { return a; }
+    public double getB() { return b; }
+    public double getC() { return c; }
+    public double getD() { return d; }
+    @Override
+    public double CalcCentroid() {
+        return (a + b + c + d) / 4.0;
+    }
+
 }

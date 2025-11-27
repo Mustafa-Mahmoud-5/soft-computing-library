@@ -15,6 +15,9 @@ public class FuzzyVariable {
     private double max;
     @Getter @Setter
     private Map<String, FuzzySet> fuzzySets = new HashMap<>();
+    @Getter @Setter
+        // Crisp value for this linguistic variable (nullable). If null, engine may use a default strategy.
+    private Double value = null;
 
     public FuzzyVariable(String name, double min, double max){
         this.name = name;
