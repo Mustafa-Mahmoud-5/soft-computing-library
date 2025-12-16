@@ -16,4 +16,11 @@ public class Guassian implements MembershipFunction {
         double diff = x - c;
         return Math.exp(- (diff * diff) / (2 * sigma * sigma));
     }
+    public double getC() { return c; }
+    public double getSigma() { return sigma; }
+    @Override
+    public double CalcCentroid() {
+        return c;
+    }
+
 }
