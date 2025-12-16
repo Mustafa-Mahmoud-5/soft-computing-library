@@ -32,12 +32,12 @@ public class FeedForwardNeuralNetwork{
     @Getter @Setter
     WEIGHT_INITIALIZATION_STRATEGY weightInitializationStrategy;
 
-    private void applyForwardPropagation() {
-
+    private List<Double> applyForwardPropagation() {
+        return List.of();
     }
 
-    private void applyBackwardPropagation() {
-
+    private List<Double> applyBackwardPropagation() {
+        return List.of();
     }
 
     public double train(List<DataRow> dataset) {
