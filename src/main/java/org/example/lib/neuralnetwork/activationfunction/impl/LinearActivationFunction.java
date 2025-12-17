@@ -4,12 +4,12 @@ import org.example.lib.neuralnetwork.activationfunction.ActivationFunction;
 
 public class LinearActivationFunction implements ActivationFunction {
     @Override
-    public double calculateFx(int x) {
-        return 0;
+    public double calculateFx(double x) {
+        return x;
     }
 
     @Override
-    public double calculateDerivative(int x) {
-        return 0;
+    public double calculateDerivative(double y) {
+        return 1;
     }
 }
