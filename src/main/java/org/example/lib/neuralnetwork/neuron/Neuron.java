@@ -6,7 +6,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class Neuron {
-    int input;
-    int output;
-    int error;
+    double netInput; // net: sum(weight*aPrev)
+    double output; // a: from activation function
+    double deltaError; // δ
 }

@@ -1,6 +1,8 @@
 package org.example.lib.neuralnetwork.activationfunction;
 
+import java.util.List;
+
 public interface ActivationFunction {
-    public double calculateFx(int x);
-    public double calculateDerivative(int x);
+    public List<Double> calculateFxForLayer(List<Double> nets);
+    public double calculateDerivative(double y);
 }
