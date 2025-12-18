@@ -32,8 +32,7 @@ public class FeedForwardNeuralNetwork {
     @Setter
     private double epochs = 50;
     @Getter
-    @Setter
-    private List<LayerConfig> hiddenLayersConfig; //[#nodes in layer 1, #nodes in layer2]
+    private List<LayerConfig> layersConfig; //[#nodes in layer 1, #nodes in layer2]
     @Getter
     @Setter
     int inputSize;
@@ -46,8 +45,8 @@ public class FeedForwardNeuralNetwork {
     public void initializeNetwork() {
         int prevSize = inputSize; // the size of the firstt layer depends on the input given by user
 
-        for(int i = 0; i < hiddenLayersConfig.size(); i++) {
-            LayerConfig config = hiddenLayersConfig.get(i);
+        for(int i = 0; i < layersConfig.size(); i++) {
+            LayerConfig config = layersConfig.get(i);
             int layerSize = config.getNeuronsCount();
             ActivationFunction layerActivationFunc = initializeActivationType(config.getActivationFunctionType());
 
@@ -119,6 +118,18 @@ public class FeedForwardNeuralNetwork {
             case RANDOM -> this.weightInitializationStrategy = new RandomUniformInitialization();
             case HE -> this.weightInitializationStrategy = new HeInitialization();
             default -> throw new IllegalArgumentException("Unsupported Weight initialization strategy: " + type);
+        }
+    }
+
+    public void setLayers(List<LayerConfig> layersConfig) {
+        for (int i = 0; i < layersConfig.size() - 1; i++) {
+            if(layersConfig.get(i).getNeuronsCount() <= 0) {
+                throw new IllegalArgumentException("Layer Neurons must be > 0");
+            }
+            if(layersConfig.get(i).getActivationFunctionType() ==  ACTIVATION_FUNCTION_TYPE.SOFT_MAX) {
+                throw new IllegalArgumentException("Softmax is not supported for middle/hidden layers");
+            }
+            this.layersConfig = layersConfig;
         }
     }
 

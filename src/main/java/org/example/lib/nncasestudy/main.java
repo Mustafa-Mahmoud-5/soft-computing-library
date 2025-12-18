@@ -17,7 +17,7 @@ public class main {
         List<LayerConfig> layers = List.of(
                 new LayerConfig(5, ACTIVATION_FUNCTION_TYPE.SIGMOID)
         );
-        nn.setHiddenLayersConfig(layers);
+        nn.setLayers(layers);
         nn.initializeNetwork();
         nn.printLayers();
     }

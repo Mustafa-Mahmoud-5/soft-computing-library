@@ -1,18 +1,37 @@
 package org.example.lib.neuralnetwork.activationfunction.impl;
 
 import org.example.lib.neuralnetwork.activationfunction.ActivationFunction;
-// this needs to receive all nodes.nets at once in order to calculate their output a
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SoftMaxActivationFunction implements ActivationFunction {
+
+    // Formula: softmax(net[k]) = e^(net[k] - max(nets)) / summation(e^ (net[i] - max(nets))
     @Override
-    public double calculateFx(double x) {
-        return 0;
+    public List<Double> calculateFxForLayer(List<Double> nets) {
+        List<Double> outputs = new ArrayList<>();
+
+
+        double max = nets.get(0);
+        for (Double v : nets) {
+            if (v > max) max = v;
+        }
+
+        double sum = 0;
+        for (Double v : nets) {
+            sum += Math.exp(v - max); // math.exp is euler
+        }
+
+        for (Double v : nets) {
+            outputs.add(Math.exp(v - max) / sum);
+        }
+
+        return outputs;
     }
 
     @Override
     public double calculateDerivative(double y) {
-        // derivative of softmax requires calculating the Jacobin Matrix
-        // instead, if we want to calculate δ in case the activation is softmax with categoricalCrossEntropy
-        // the formula becomes δk = predicted - actual
-        return 0;
+        throw new UnsupportedOperationException("derivative of softmax is Unsupported operation");
     }
 }
