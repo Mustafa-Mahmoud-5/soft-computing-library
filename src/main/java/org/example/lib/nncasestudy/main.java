@@ -9,7 +9,6 @@ import org.example.lib.neuralnetwork.enums.LOSS_FUNCTION_STRATEGY;
 import org.example.lib.neuralnetwork.enums.WEIGHT_INITIALIZATION_TYPE;
 import org.example.lib.neuralnetwork.layer.LayerConfig;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,13 +26,13 @@ public class main {
 
         FeedForwardNeuralNetwork nn = new FeedForwardNeuralNetwork();
 
-        nn.setInputSize(8);
-        nn.setEpochs(100);
+        nn.setInputSize(9);
+        nn.setEpochs(10);
         nn.setLearningRate(0.03);
         nn.setWeightInitializationStrategy(WEIGHT_INITIALIZATION_TYPE.HE);
         List<LayerConfig> layers = List.of(
-                new LayerConfig(32, ACTIVATION_FUNCTION_TYPE.RELU),
-                new LayerConfig(32, ACTIVATION_FUNCTION_TYPE.RELU),
+                new LayerConfig(10, ACTIVATION_FUNCTION_TYPE.RELU),
+                new LayerConfig(10, ACTIVATION_FUNCTION_TYPE.RELU),
                 new LayerConfig(3, ACTIVATION_FUNCTION_TYPE.SOFT_MAX)
             );
         nn.setLossFunctionStrategy(LOSS_FUNCTION_STRATEGY.CROSS_ENTROPY);
@@ -44,5 +43,12 @@ public class main {
         nn.train(trainData);
         double accuracy = nn.test(testData);
         System.out.println("Accuracy: " + accuracy * 100 + "%");
+
+
+
+
+        // A real-world prediction cases
+        Example example = new Example();
+        example.predict(nn);
     }
 }

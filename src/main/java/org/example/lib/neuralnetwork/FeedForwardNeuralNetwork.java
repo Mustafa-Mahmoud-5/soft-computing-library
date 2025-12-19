@@ -115,7 +115,6 @@ public class FeedForwardNeuralNetwork {
             // inputs in next layer is current output of this layer
             currentInputs = layerOutputs;
         }
-
         return currentInputs;
     }
 
@@ -200,8 +199,14 @@ public class FeedForwardNeuralNetwork {
         }
     }
 
-    public double predict(List<DataRow> dataset) {
-        return 0.0;
+
+    public int predict(DataRow row) {
+        if(row.getInputs().size() != inputSize) {
+            throw new IllegalArgumentException("input size doesn't match dataset input size");
+        }
+        List<Double> predicted = applyForwardPropagation(row.getInputs());
+        System.out.println("predicted" + predicted);
+        return Utils.argMax(predicted);
     }
 
     public double test(List<DataRow> dataset) {
