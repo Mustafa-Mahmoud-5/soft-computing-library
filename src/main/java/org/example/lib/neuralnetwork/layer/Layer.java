@@ -20,6 +20,7 @@ public class Layer {
     List<Neuron> neurons = new ArrayList<>();
     @Getter
     List<List<Double>> weightMatrix = new ArrayList<>();
+    @Getter
     ActivationFunction activationFunction;
 
     public Layer(int size, int prevSize, ActivationFunction activationFunction) {
